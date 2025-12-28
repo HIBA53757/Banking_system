@@ -6,22 +6,22 @@
 
 
 
-class client
+class Client
 {
-//
-    private $client_id;
+    private $pdo;
+    private $id;
     private $name;
     private $email;
 
-    public function __construct($name, $email)
+    public function __construct(PDO $pdo, string $name, string $email)
     {
+        $this->pdo = $pdo;
         $this->setName($name);
         $this->setEmail($email);
     }
-
     public function getId()
     {
-        return $this->client_id;
+        return $this->id;
     }
 
     public function getName()
@@ -33,9 +33,13 @@ class client
         return $this->email;
     }
 
-     public function setName($name) {
-        $this->name = htmlspecialchars($name);
+    public function setName(string $name)
+{
+    if (empty($name)) {
+        throw new Exception("Nom invalide");
     }
+    $this->name = htmlspecialchars($name);
+}
 
      public function setEmail($email) {
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -61,7 +65,7 @@ class client
         $sql = "INSERT INTO client (nom, email) VALUES (?, ?)";
         $stmt = $db->prepare($sql);
         $stmt->execute([$this->name, $this->email]);
-        $this->client_id = $db->lastInsertId();
+        $this->id = $db->lastInsertId();
     }
     
 
