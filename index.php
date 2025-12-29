@@ -7,10 +7,8 @@ require_once "classes/courant.php";
 require_once "classes/epargne.php";
 require_once "classes/Transaction.php";
 
-// Get PDO connection
 $pdo = Database::get_instance()->connection();
 
-// Helper to print with <br>
 function printLine($text) {
     echo $text . "<br>";
 }
@@ -18,13 +16,12 @@ function printLine($text) {
 printLine("=== TEST CLIENTS ===");
 
 try {
-    // CREATE CLIENT
+
     $client = new Client($pdo, "Ali", "ali_test_unique" . rand(1000,9999) . "@gmail.com");
     $client->save();
     printLine("Client créé : ID " . $client->getId() . " | " . $client->getEmail());
     printLine("");
 
-    // LIST ALL CLIENTS
     printLine("--- Liste des clients ---");
     $clients = Client::show();
     foreach ($clients as $c) {
@@ -34,7 +31,6 @@ try {
     printLine("");
     printLine("=== TEST COMPTES ===");
 
-    // CREATE COMPTES WITH UNIQUE NUMBERS
     $numeroCourant = "CC" . rand(1000, 9999);
     $compteCourant = new Compte_Courant($pdo, $numeroCourant, 100, $client->getId());
     $compteCourant->create();
@@ -50,19 +46,16 @@ try {
 
     $transaction = new Transaction($pdo);
 
-    // DEPOSIT
     $transaction->deposer($compteCourant, 50);
     printLine("Dépôt sur compte Courant : +50 | Nouveau solde = " . $compteCourant->getSolde());
 
-    // WITHDRAWAL
     $transaction->retirer($compteCourant, 30);
     printLine("Retrait sur compte Courant : -30 | Nouveau solde = " . $compteCourant->getSolde());
 
-    // DEPOSIT on savings
     $transaction->deposer($compteEpargne, 200);
     printLine("Dépôt sur compte Epargne : +200 | Nouveau solde = " . $compteEpargne->getSolde());
 
-    // WITHDRAWAL on savings
+
     $transaction->retirer($compteEpargne, 100);
     printLine("Retrait sur compte Epargne : -100 | Nouveau solde = " . $compteEpargne->getSolde());
 
